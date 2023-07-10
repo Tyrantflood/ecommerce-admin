@@ -60,7 +60,7 @@ export const StoreModal = () => {
               />
               <div className=" w-full pt-6 space-x-2 flex items-center justify-end ">
                 <Button variant="outline" onClick={storeModal.onClose}>
-                  Cancel.
+                  Cancel
                 </Button>
                 <Button type="submit"> Continue</Button>
               </div>
