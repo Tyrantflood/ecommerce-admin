@@ -22,12 +22,28 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { AlertModal } from "@/components/modals/alert-modal";
-import { useOrigin } from "@/hooks/use-origin";
 import ImageUpload from "@/components/ui/image-upload";
+
+const MAX_FILE_SIZE = 500000;
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 
 const formSchema = z.object({
   label: z.string().min(3).max(64),
-  imageUrl: z.string().min(1),
+  imageUrl: z.string(),
+  // .any()
+  // .refine(
+  //   (files) => files?.[0]?.size <= MAX_FILE_SIZE,
+  //   `Max image size is 5MB.`
+  // )
+  // .refine(
+  //   (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+  //   "Only .jpg, .jpeg, .png and .webp formats are supported."
+  // ),
 });
 
 type BillboardFormValue = z.infer<typeof formSchema>;
@@ -41,7 +57,6 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
 }) => {
   const params = useParams();
   const router = useRouter();
-  const origin = useOrigin();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -62,9 +77,17 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
   const onSubmit = async (data: BillboardFormValue) => {
     try {
       setLoading(true);
-      await axios.patch(`/api/stores/${params.storeId}`, data);
+      if (initialData) {
+        await axios.patch(
+          `/api/${params.storeId}/billboards/${params.billboardId}`,
+          data
+        );
+      } else {
+        await axios.post(`/api/${params.storeId}/billboards`, data);
+      }
       router.refresh();
-      toast.success("Store Updated!");
+      router.push(`/${params.storeId}/billboards`);
+      toast.success(toastMessage);
     } catch (error) {
       toast.error("Something went wrong");
     } finally {
@@ -75,12 +98,16 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/stores/${params.storeId}`);
+      await axios.delete(
+        `/api/${params.storeId}/billboards/${params.billboardId}`
+      );
       router.refresh;
       router.push("/");
-      toast.success("Store deleted!");
+      toast.success("Billboard deleted!");
     } catch (error) {
-      toast.error("Make sure to remove all products and categories first");
+      toast.error(
+        "Make sure to remove all categories using this billboard first"
+      );
     } finally {
       setLoading(false);
       setOpen(false);
@@ -116,7 +143,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
         >
           <FormField
             control={form.control}
-            name="label"
+            name="imageUrl"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Background Image</FormLabel>
@@ -132,6 +159,7 @@ export const BillboardForm: React.FC<BillboardFormProps> = ({
               </FormItem>
             )}
           />
+
           <div className=" grid grid-cols-3 gap-8">
             <FormField
               control={form.control}
