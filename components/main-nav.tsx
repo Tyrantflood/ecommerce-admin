@@ -15,17 +15,17 @@ export function MainNav({
     {
       href: `/${params.storeId}`,
       label: "Dashobard",
-      active: pathname === `/$(params.storeId)`,
+      active: pathname === `/${params.storeId}`,
     },
     {
       href: `/${params.storeId}/billboards`,
       label: "Biillboards",
-      active: pathname === `/$(params.storeId)/billboards`,
+      active: pathname === `/${params.storeId}/billboards`,
     },
     {
       href: `/${params.storeId}/settings`,
       label: "Settings",
-      active: pathname === `/$(params.storeId)/settings`,
+      active: pathname === `/${params.storeId}/settings`,
     },
   ];
   return (
