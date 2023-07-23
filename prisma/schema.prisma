@@ -31,3 +31,4 @@ model Billboard{
 
   @@index([storeId])
 }
+
