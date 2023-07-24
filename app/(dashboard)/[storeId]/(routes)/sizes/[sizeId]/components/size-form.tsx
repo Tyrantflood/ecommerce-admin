@@ -83,7 +83,7 @@ export const SizeForm: React.FC<SizeFormProps> = ({ initialData }) => {
       router.push(`${params.storeId}/sizes`);
       toast.success("Size deleted!");
     } catch (error) {
-      toast.error("Make sure to remove all categories using this Size first");
+      toast.error("Make sure to remove all products using this size first");
     } finally {
       setLoading(false);
       setOpen(false);
