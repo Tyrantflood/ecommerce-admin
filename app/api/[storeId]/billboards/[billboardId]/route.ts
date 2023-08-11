@@ -20,7 +20,7 @@ export async function GET(
     return NextResponse.json(billboard);
   } catch (error) {
     console.log("[BILLBOARD_GET", error);
-    return new NextResponse("internal error", { status: 500 });
+    return new NextResponse("Internal error", { status: 500 });
   }
 }
 
@@ -33,8 +33,9 @@ export async function PATCH(
     const body = await req.json();
 
     const { label, imageUrl } = body;
+
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("Unauthorized", { status: 403 });
     }
     if (!label) {
       return new NextResponse("label is Required", { status: 400 });
@@ -45,6 +46,7 @@ export async function PATCH(
     if (!params.billboardId) {
       return new NextResponse("Billboard Id is required", { status: 400 });
     }
+
     const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
@@ -53,10 +55,10 @@ export async function PATCH(
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthoriezed", { status: 403 });
+      return new NextResponse("Unauthoriezed", { status: 405 });
     }
 
-    const billboard = await prismadb.billboard.updateMany({
+    const billboard = await prismadb.billboard.update({
       where: {
         id: params.billboardId,
       },
@@ -65,6 +67,7 @@ export async function PATCH(
         imageUrl,
       },
     });
+    
     return NextResponse.json(billboard);
   } catch (error) {
     console.log("[BILLBOARD_PATCH", error);
@@ -80,7 +83,7 @@ export async function DELETE(
     const { userId } = auth();
 
     if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
+      return new NextResponse("Unauthorized", { status: 403 });
     }
 
     if (!params.billboardId) {
@@ -97,7 +100,7 @@ export async function DELETE(
       return new NextResponse("Unauthoriezed", { status: 403 });
     }
 
-    const billboard = await prismadb.billboard.deleteMany({
+    const billboard = await prismadb.billboard.delete({
       where: {
         id: params.billboardId,
       },
